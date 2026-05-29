@@ -67,6 +67,16 @@ export default function Navbar({ publicKey, onConnect, onDisconnect }: NavbarPro
     }
   }, [router.pathname]);
 
+  const balance: string | null = null;
+  const balanceLoading = false;
+
+  const switchLanguage = (lang: string) => {
+    i18n.changeLanguage(lang);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("preferredLocale", lang);
+    }
+  };
+
   return (
     <>
       {/* Skip to main content (#287) */}
