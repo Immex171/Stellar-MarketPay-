@@ -39,6 +39,9 @@ export default function Navbar({ publicKey, onConnect, onDisconnect }: NavbarPro
   const [hasJobAlertBadge, setHasJobAlertBadge] = useState(false);
   const { currencyMode, setCurrencyMode, priceLoading } = usePriceContext();
   const [darkMode, setDarkMode] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [balance, setBalance] = useState<string | null>(null);
+  const [balanceLoading, setBalanceLoading] = useState(false);
 
   // Dark mode initialization — respect OS preference on first visit
   useEffect(() => {
@@ -104,20 +107,19 @@ export default function Navbar({ publicKey, onConnect, onDisconnect }: NavbarPro
     }
   }, [router.pathname]);
 
-  const balance: string | null = null;
-  const balanceLoading = false;
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [router.pathname]);
+
+  const switchLanguage = (lang: string) => {
+    localStorage.setItem("preferredLocale", lang);
+    i18next.changeLanguage(lang);
+  };
 
   return (
-    <>
-      {/* Skip to main content (#287) */}
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[9999] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-market-500 focus:text-white focus:font-bold focus:text-sm"
-      >
-        {t("nav.skipToContent")}
-      </a>
-    <nav className="sticky top-0 z-50 border-b border-[rgba(251,191,36,0.10)] dark:border-[rgba(251,191,36,0.06)] bg-ink-900/85 dark:bg-[#050403]/90 backdrop-blur-xl">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+    <nav className="sticky top-0 z-50 border-b border-[rgba(251,191,36,0.10)] bg-ink-900/85 backdrop-blur-xl">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2 sm:gap-4">
 
         {/* Logo */}
         <Link href="/" locale={false} className="flex items-center gap-2.5 group flex-shrink-0">
@@ -164,6 +166,15 @@ export default function Navbar({ publicKey, onConnect, onDisconnect }: NavbarPro
           ))}
         </div>
 
+        {/* Spacer */}
+        <div className="flex-1 md:flex-none" />
+
+        {/* Language Switcher - hidden on mobile, visible on tablet+ */}
+        <div className="hidden sm:flex items-center">
+          <select
+            value={i18n.language}
+            onChange={(e) => switchLanguage(e.target.value)}
+            className="bg-market-900/40 border border-amber-900/30 rounded px-2 py-1 text-xs text-amber-100 cursor-pointer min-h-[44px]"
         {/* Currency Toggle */}
         <div className="hidden md:flex items-center">
           <button
@@ -337,23 +348,6 @@ function HamburgerIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
-    </svg>
-  );
-}
-
-function SunIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75}>
-      <circle cx="12" cy="12" r="4" />
-      <path strokeLinecap="round" d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-    </svg>
-  );
-}
-
-function MoonIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
     </svg>
   );
 }

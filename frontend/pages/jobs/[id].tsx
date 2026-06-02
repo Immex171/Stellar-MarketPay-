@@ -252,29 +252,26 @@ export default function JobDetail({ publicKey, onConnect }: JobDetailProps) {
                 {job.title}
               </h1>
 
-              <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div className="flex flex-wrap gap-3 text-xs sm:text-sm text-amber-700">
-                  <span>Posted {timeAgo(job.createdAt)}</span>
-                  <span>{applications.length} application{applications.length === 1 ? "" : "s"}</span>
-                  {job.deadline && <span>Deadline: {formatDate(job.deadline)}</span>}
-                </div>
+                <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div className="flex flex-wrap gap-3 text-xs sm:text-sm text-amber-700">
+                    <span>Posted {timeAgo(job.createdAt)}</span>
+                    <span>{applications.length} application{applications.length === 1 ? "" : "s"}</span>
+                    {job.deadline && <span>Deadline: {formatDate(job.deadline)}</span>}
+                  </div>
 
-                <div className="sm:text-right">
-                  <p className="text-xs text-amber-800 mb-1">Budget</p>
-                  <p className="font-mono font-bold text-xl sm:text-2xl text-market-400">
-                    {formatXLM(job.budget)} {job.currency}
-                  </p>
-                  <a
-                    href={accountUrl(job.clientAddress)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 mt-2 text-xs sm:text-sm text-amber-700 hover:text-market-400 transition-colors"
-                  >
-                    Client: {shortenAddress(job.clientAddress)} ↗
-                  </a>
+                  <div className="sm:text-right">
+                    <p className="text-xs text-amber-800 mb-1">Budget</p>
+                    <p className="font-mono font-bold text-xl sm:text-2xl text-market-400">{formatXLM(job.budget)} {job.currency}</p>
+                    <a
+                      href={accountUrl(job.clientAddress)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 mt-2 text-xs sm:text-sm text-amber-700 hover:text-market-400 transition-colors"
+                    >
+                      Client: {shortenAddress(job.clientAddress)} ↗
+                    </a>
+                  </div>
                 </div>
-              </div>
-            </div>
           </div>
 
           <div className="prose prose-sm max-w-none">
@@ -429,6 +426,32 @@ export default function JobDetail({ publicKey, onConnect }: JobDetailProps) {
                 </p>
                 <WalletConnect onConnect={onConnect} />
               </div>
+            ) : hasApplied ? (
+              <div className="card text-center py-8 border-market-500/20">
+                <p className="text-market-400 font-medium mb-1">Application submitted</p>
+                <p className="text-amber-800 text-sm">
+                  The client will review your proposal shortly.
+                </p>
+              </div>
+            ) : showApplyForm ? (
+              <ApplicationForm
+                job={job}
+                publicKey={publicKey}
+                prefillData={prefillData}
+                onSuccess={() => {
+                  setShowApplyForm(false);
+                  fetchApplications(job.id).then(setApplications);
+                }}
+              />
+            ) : (
+              <div className="text-center">
+                <button
+                  onClick={() => setShowApplyForm(true)}
+                  className="btn-primary text-sm sm:text-base px-6 sm:px-10 py-2.5 sm:py-3.5 w-full sm:w-auto"
+                >
+                  Apply for this Job
+                </button>
+              </div>
             ) : (
               <p className="text-sm text-amber-700">
                 Timeout period has expired. Only the client can claim a refund.
@@ -503,18 +526,11 @@ export default function JobDetail({ publicKey, onConnect }: JobDetailProps) {
       {/* ── Dispute modal ── */}
       {showDisputeModal && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-ink-950/80 backdrop-blur-sm"
-            onClick={() => setShowDisputeModal(false)}
-          />
+          <div className="absolute inset-0 bg-ink-950/80 backdrop-blur-sm" onClick={() => setShowDisputeModal(false)} />
           <div className="relative w-full max-w-md bg-ink-900 border border-market-500/20 rounded-2xl p-4 sm:p-6 shadow-2xl animate-scale-in max-h-[90vh] overflow-y-auto">
-            <h3 className="font-display text-lg sm:text-xl font-bold text-amber-100 mb-2">
-              Raise a Dispute
-            </h3>
-            <p className="text-xs sm:text-sm text-amber-800 mb-6">
-              Flag this job for admin review. This will block escrow release until resolved.
-            </p>
-
+            <h3 className="font-display text-lg sm:text-xl font-bold text-amber-100 mb-2">Raise a Dispute</h3>
+            <p className="text-xs sm:text-sm text-amber-800 mb-6">Flag this job for admin review. This will block escrow release until resolved.</p>
+            
             <div className="space-y-4">
               <div>
                 <label className="label">Reason</label>
